@@ -1,16 +1,14 @@
-import os
-import sys
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def configure_tesseract():
+    """Auto-detect or install Tesseract OCR and configure pytesseract."""
     import pytesseract
-    if getattr(sys, 'frozen', False):
-        base_path = sys._MEIPASS
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
+    from install_tesseract import ensure_tesseract
 
-    tesseract_path = os.path.join(base_path, "resources", "tesseract", "tesseract.exe")
-
-    if not os.path.exists(tesseract_path):
-        raise RuntimeError(f"Tesseract not found at {tesseract_path}")
-
+    tesseract_path = ensure_tesseract()
     pytesseract.pytesseract.tesseract_cmd = tesseract_path
+    logger.info(f"Tesseract configured: {tesseract_path}")
+    print(f"[Tesseract] Configured: {tesseract_path}")
