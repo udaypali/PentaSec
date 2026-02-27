@@ -9,9 +9,6 @@ DIST_DIR = "dist"
 BUILD_DIR = "build"
 SPEC_FILE = f"{APP_NAME}.spec"
 
-# Folder that must be bundled
-TESSERACT_DIR = os.path.join("resources", "tesseract")
-
 
 def clean():
     """Remove old build artifacts."""
@@ -28,8 +25,6 @@ def build():
     """Run PyInstaller with required flags."""
     print("[*] Building executable with PyInstaller...")
 
-    add_data_arg = f"{TESSERACT_DIR};resources/tesseract"
-
     command = [
         sys.executable,
         "-m",
@@ -39,8 +34,6 @@ def build():
         "--onefile",
         "--name",
         APP_NAME,
-        "--add-data",
-        add_data_arg,
         "--add-data",
         ".env;.",
         ENTRY_FILE,

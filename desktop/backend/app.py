@@ -13,9 +13,13 @@ from security import load_env
 load_env()
 
 app = Flask(__name__)
-CORS(app)                              
+CORS(app)
 
-configure_tesseract()
+try:
+    configure_tesseract()
+except RuntimeError as e:
+    print(f"[WARNING] Tesseract setup failed: {e}")
+    print("[WARNING] Image redaction features will be unavailable.")
 
 from routes.auth_routes import auth_bp
 from routes.project_routes import project_bp
