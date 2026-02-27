@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Theme</title>
+</head>
+<body>
+    <h1>Clearing Theme Preferences...</h1>
+    <p id="status">Processing...</p>
+    
+    <script>
+        // Clear all theme-related localStorage
+        localStorage.removeItem('theme');
+        localStorage.removeItem('next-themes');
+        
+        // Show what was cleared
+        const status = document.getElementById('status');
+        status.innerHTML = 'Theme preferences cleared!<br><br>Please close this tab and refresh your app at <a href="http://localhost:3000">http://localhost:3000</a>';
+        
+        console.log('Cleared theme from localStorage');
+    </script>
+</body>
+</html>
