@@ -7,7 +7,6 @@ import jwt
 from functools import wraps
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
-import google.generativeai as genai
 from bson.objectid import ObjectId
 
 from config import SETTINGS_FILE, DB_FILE, REPORT_ARCHIVE_FILE, EVIDENCE_DIR
@@ -74,6 +73,7 @@ def increment_user_stat(stat_key):
     save_settings(settings)
 
 def get_ai_model():
+    import google.generativeai as genai
     settings = load_settings()
     ai_settings = settings.get('ai', {})
     api_key = ai_settings.get('apiKey') or os.getenv("GEMINI_API_KEY")                          
