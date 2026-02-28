@@ -199,7 +199,7 @@ def token_required(f):
             resp = requests.post(
                 f"{RENDER_URL}/api/auth/verify",
                 json={"token": token},
-                timeout=10
+                timeout=60
             )
             if resp.status_code != 200:
                 return jsonify({'error': 'Token is invalid!'}), 401
