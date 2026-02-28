@@ -9,6 +9,8 @@ from utils import token_required
 
 auth_bp = Blueprint('auth', __name__)
 
+# OAuth tokens stored in MongoDB so they survive Render free-tier restarts
+# Falls back to in-memory dict if DB is unavailable
 oauth_tokens = {}
 
 @auth_bp.route('/api/auth/signup', methods=['POST'])
@@ -233,20 +235,46 @@ def store_oauth_token():
     if not token or not session_id:
         return jsonify({"error": "Token and session_id required"}), 400
     
-    oauth_tokens[session_id] = {
+    entry = {
         'token': token,
         'user': user,
         'timestamp': datetime.datetime.utcnow()
     }
+
+    # Persist in MongoDB if available, otherwise fall back to memory
+    try:
+        if db.db is not None:
+            db.db['oauth_tokens'].replace_one(
+                {'session_id': session_id},
+                {'session_id': session_id, **entry},
+                upsert=True
+            )
+        else:
+            oauth_tokens[session_id] = entry
+    except Exception:
+        oauth_tokens[session_id] = entry
     
     return jsonify({"message": "Token stored"}), 200
 
 @auth_bp.route('/api/auth/oauth-retrieve/<session_id>', methods=['GET'])
 def retrieve_oauth_token(session_id):
     """Retrieve OAuth token for Electron app"""
+    # Try MongoDB first
+    try:
+        if db.db is not None:
+            doc = db.db['oauth_tokens'].find_one_and_delete({'session_id': session_id})
+            if doc:
+                doc.pop('_id', None)
+                doc.pop('session_id', None)
+                return jsonify(doc), 200
+    except Exception:
+        pass
+
+    # Fall back to in-memory
     if session_id in oauth_tokens:
-        data = oauth_tokens.pop(session_id)                          
+        data = oauth_tokens.pop(session_id)
         return jsonify(data), 200
+
     return jsonify({"error": "No token found"}), 404
 
 @auth_bp.route('/api/auth/signin', methods=['POST'])
@@ -310,3 +338,28 @@ def update_profile(current_user):
         return jsonify({"message": "Profile updated successfully"}), 200
     else:
         return jsonify({"error": "Failed to update profile"}), 500
+
+
+@auth_bp.route('/api/auth/verify', methods=['POST'])
+def verify_token():
+    """Verify a JWT and return the user — called by the local backend."""
+    data = request.json or {}
+    token = data.get('token')
+    if not token:
+        return jsonify({'error': 'Token required'}), 400
+    try:
+        secret_key = os.getenv('SECRET_KEY')
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user = db.get_user_by_email(payload['email'])
+        if not user:
+            return jsonify({'error': 'User not found'}), 401
+        return jsonify({
+            'user_id': str(user['_id']),
+            'email': user['email'],
+            'name': user.get('name', 'User'),
+            'picture': user.get('picture'),
+            'report_count': user.get('report_count', 0),
+            'image_count': user.get('image_count', 0),
+        }), 200
+    except Exception as e:
+        return jsonify({'error': 'Invalid token'}), 401

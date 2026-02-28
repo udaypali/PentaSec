@@ -3,13 +3,12 @@ import json
 import hashlib
 import time
 import datetime
-import jwt
+import requests
 from functools import wraps
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
-from bson.objectid import ObjectId
 
-from config import SETTINGS_FILE, DB_FILE, REPORT_ARCHIVE_FILE, EVIDENCE_DIR
+from config import SETTINGS_FILE, DB_FILE, REPORT_ARCHIVE_FILE, EVIDENCE_DIR, RENDER_URL
 from encryption import encryptor
 from database import db
 
@@ -195,26 +194,19 @@ def token_required(f):
         
         if not token:
             return jsonify({'error': 'Token is missing!'}), 401
-        
-        try:
-            secret_key = os.getenv("SECRET_KEY")
-            data = jwt.decode(token, secret_key, algorithms=["HS256"])
-            try:
-                user_id = ObjectId(data['user_id'])
-            except:
-                return jsonify({'error': 'Invalid user ID format!'}), 401
 
-            current_user = db.users_collection.find_one({'_id': user_id}) if db.users_collection is not None else None
-            
-            if not current_user:
-                 current_user = db.get_user_by_email(data['email'])
-                 
-            if not current_user:
-                return jsonify({'error': 'User not found!'}), 401
-                
+        try:
+            resp = requests.post(
+                f"{RENDER_URL}/api/auth/verify",
+                json={"token": token},
+                timeout=10
+            )
+            if resp.status_code != 200:
+                return jsonify({'error': 'Token is invalid!'}), 401
+            current_user = resp.json()
         except Exception as e:
-            print(f"Token error: {e}")                        
-            return jsonify({'error': 'Token is invalid!'}), 401
+            print(f"Token verify error: {e}")
+            return jsonify({'error': 'Token verification failed!'}), 401
             
         return f(current_user, *args, **kwargs)
     return decorated

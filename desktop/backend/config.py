@@ -33,3 +33,7 @@ else:
         os.makedirs(REPORT_ARCHIVE_IMAGES_DIR)
 
 SETTINGS_FILE = os.path.join(DATABASE_DIR, 'settings.json')
+
+# Render backend URL — used by token_required to verify JWTs.
+# Override with RENDER_URL env var for dev/testing.
+RENDER_URL = os.getenv("RENDER_URL", "https://pentasec.onrender.com")
