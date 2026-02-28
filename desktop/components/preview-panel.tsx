@@ -14,6 +14,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
+const renderRichText = (text: string) => {
+  if (!text) return null;
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
+
 interface PreviewPanelProps {
   report: GeneratedReport
   onReportChange: (report: GeneratedReport) => void
@@ -63,30 +74,87 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
         }
       }
 
-      const addWrappedText = (text: string, x: number, startY: number, maxWidth: number, lineHeight: number, fontSize: number) => {
+      const addWrappedText = (text: string, x: number, startY: number, maxWidth: number, lineHeight: number, fontSize: number, wrapXOffset: number = 0) => {
         pdf.setFontSize(fontSize)
-        const lines = pdf.splitTextToSize(text, maxWidth)
-        for (const line of lines) {
-          checkPage(lineHeight)
-          pdf.text(line, x, y)
-          y += lineHeight
+        // First split by explicit new lines
+        const paragraphs = text.split('\n');
+
+        for (let p = 0; p < paragraphs.length; p++) {
+          const paragraph = paragraphs[p];
+          if (!paragraph.trim()) {
+            y += lineHeight; // Empty lines just advance Y
+            continue;
+          }
+
+          let currentX = x;
+          const parts = paragraph.split(/(\*\*.*?\*\*)/g)
+
+          for (let i = 0; i < parts.length; i++) {
+            let chunk = parts[i];
+            if (!chunk) continue;
+
+            let isBold = false;
+            if (chunk.startsWith('**') && chunk.endsWith('**')) {
+              isBold = true;
+              chunk = chunk.slice(2, -2);
+            }
+
+            pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
+
+            const words = chunk.split(' ');
+            for (let w = 0; w < words.length; w++) {
+              const word = words[w];
+              if (!word) {
+                // handle structural double spaces if any
+                currentX += pdf.getTextWidth(' ');
+                continue;
+              }
+
+              let wordWidth = pdf.getTextWidth(word);
+              if (currentX + wordWidth > margin + maxWidth && currentX > x) {
+                // Wrap to next line
+                currentX = x + wrapXOffset;
+                y += lineHeight;
+                checkPage(lineHeight);
+              }
+              pdf.text(word, currentX, y);
+              currentX += wordWidth + pdf.getTextWidth(' ');
+            }
+          }
+          // After finishing a paragraph, advance Y for the next block
+          y += lineHeight;
         }
       }
 
       // Header bar
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(18)
+      const titleText = editedReport.title || 'Untitled Vulnerability'
+      const titleLines = pdf.splitTextToSize(titleText, contentWidth)
+      const titleLineHeight = 8
+      const titleTotalHeight = titleLines.length * titleLineHeight
+      const startYTitle = 28
+      const dateY = startYTitle + titleTotalHeight + 2
+      const headerHeight = dateY + 7
+
       pdf.setFillColor(30, 30, 40)
-      pdf.rect(0, 0, pageWidth, 45, 'F')
+      pdf.rect(0, 0, pageWidth, headerHeight, 'F')
       pdf.setTextColor(255, 255, 255)
       pdf.setFontSize(8)
-      pdf.setFont('helvetica', 'bold')
       pdf.text('SECURITY ASSESSMENT REPORT', margin, 15)
+
       pdf.setFontSize(18)
-      pdf.text(editedReport.title || 'Untitled Vulnerability', margin, 28)
+      let currentTitleY = startYTitle
+      for (const line of titleLines) {
+        pdf.text(line, margin, currentTitleY)
+        currentTitleY += titleLineHeight
+      }
+
       pdf.setFontSize(9)
       pdf.setFont('helvetica', 'normal')
       const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-      pdf.text(`Prepared by: Security Team  |  Date: ${dateStr}`, margin, 38)
-      y = 55
+      pdf.text(`Prepared by: Security Team  |  Date: ${dateStr}`, margin, dateY)
+      y = headerHeight + 10
 
       // Severity + CVSS row
       pdf.setTextColor(0, 0, 0)
@@ -145,6 +213,8 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
       // Executive Summary (highlighted box)
       checkPage(25)
       pdf.setFillColor(239, 246, 255)
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(9)
       const summaryLines = pdf.splitTextToSize(editedReport.introduction || 'No introduction provided.', contentWidth - 10)
       const boxHeight = Math.max(20, summaryLines.length * 5 + 14)
       checkPage(boxHeight)
@@ -186,7 +256,9 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
       if (editedReport.stepsToReproduce && editedReport.stepsToReproduce.length > 0) {
         editedReport.stepsToReproduce.forEach((step, idx) => {
           checkPage(7)
-          addWrappedText(`${idx + 1}. ${step}`, margin + 2, y, contentWidth - 4, 5, 10)
+          // Strip any existing "1. " or "1) " from the beginning of the step string to avoid double numbering
+          const cleanStep = step.replace(/^\d+[\.\)]\s*/, '')
+          addWrappedText(`${idx + 1}. ${cleanStep}`, margin + 2, y, contentWidth - 4, 5, 10)
           y += 2
         })
       } else {
@@ -205,23 +277,29 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
       pdf.setFont('helvetica', 'bold')
       pdf.text('3. Proof of Concept', margin, y)
       y += 7
-      // Code-style box for POC
-      const pocText = editedReport.proofOfConcept || 'No proof of concept provided.'
-      const pocLines = pdf.splitTextToSize(pocText, contentWidth - 10)
-      const pocBoxHeight = pocLines.length * 4.5 + 8
-      checkPage(pocBoxHeight)
-      pdf.setFillColor(30, 30, 40)
-      pdf.roundedRect(margin, y, contentWidth, pocBoxHeight, 2, 2, 'F')
-      pdf.setTextColor(220, 220, 220)
-      pdf.setFontSize(8)
-      pdf.setFont('courier', 'normal')
-      let pocY = y + 6
-      for (const line of pocLines) {
-        pdf.text(line, margin + 5, pocY)
-        pocY += 4.5
-      }
-      y += pocBoxHeight + 6
       pdf.setFont('helvetica', 'normal')
+      pdf.setTextColor(60, 60, 60)
+      const pocText = editedReport.proofOfConcept || 'No proof of concept provided.'
+      const pocItems = pocText.split('\n').filter(l => l.trim() !== '')
+
+      pocItems.forEach((item) => {
+        checkPage(7)
+        // Detect if it's a sub-item (e.g., 'a. ', 'b. ', or just indented)
+        const isSubPoint = /^\s*[a-z]\.\s/i.test(item) || /^\s+/.test(item) || item.trim().startsWith('-')
+        const cleanItem = item.trim()
+
+        let startX = margin + 2;
+        let wrapXOffset = 4;
+
+        if (isSubPoint) {
+          startX = margin + 8;
+          wrapXOffset = 4;
+        }
+
+        addWrappedText(cleanItem, startX, y, contentWidth - (startX - margin), 5, 10, wrapXOffset);
+        y += 2 // Add space between main points/sub-points
+      })
+      y += 4
 
       // POC Images
       const imageDataUrls: { dataUrl: string; label: string }[] = []
@@ -447,7 +525,7 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
                   rows={3}
                 />
               ) : (
-                <p className="text-gray-800 leading-relaxed text-sm">{editedReport.introduction || 'No introduction provided.'}</p>
+                <p className="text-gray-800 leading-relaxed text-sm whitespace-pre-wrap">{renderRichText(editedReport.introduction || 'No introduction provided.')}</p>
               )}
             </section>
 
@@ -464,7 +542,7 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
                     rows={4}
                   />
                 ) : (
-                  <p className="text-gray-700 leading-relaxed text-sm">{editedReport.introduction || 'No details provided.'}</p>
+                  <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">{renderRichText(editedReport.introduction || 'No details provided.')}</p>
                 )}
               </section>
 
@@ -480,12 +558,15 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
                   />
                 ) : (
                   <ol className="text-gray-700 space-y-2 text-sm">
-                    {editedReport.stepsToReproduce.map((step, idx) => (
-                      <li key={idx} className="flex gap-3">
-                        <span className="font-bold text-gray-600 flex-shrink-0">{idx + 1}.</span>
-                        <span>{step}</span>
-                      </li>
-                    ))}
+                    {editedReport.stepsToReproduce.map((step, idx) => {
+                      const cleanStep = step.replace(/^\d+[\.\)]\s*/, '')
+                      return (
+                        <li key={idx} className="flex gap-3">
+                          <span className="font-bold text-gray-600 flex-shrink-0">{idx + 1}.</span>
+                          <span className="whitespace-pre-wrap">{renderRichText(cleanStep)}</span>
+                        </li>
+                      )
+                    })}
                   </ol>
                 )}
               </section>
@@ -502,8 +583,15 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
                   />
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-gray-900 text-gray-100 p-4 rounded font-mono text-xs overflow-x-auto border border-gray-700">
-                      <pre className="whitespace-pre-wrap">{editedReport.proofOfConcept || 'No proof of concept provided'}</pre>
+                    <div className="text-gray-700 space-y-2 text-sm pl-2">
+                      {(editedReport.proofOfConcept || 'No proof of concept provided.').split('\n').filter(l => l.trim() !== '').map((item, idx) => {
+                        const isSubPoint = /^\s*[a-z]\.\s/i.test(item) || /^\s+/.test(item) || item.trim().startsWith('-')
+                        return (
+                          <div key={idx} className={`flex gap-3 ${isSubPoint ? 'ml-6 text-gray-600' : 'font-medium'}`}>
+                            <span className="whitespace-pre-wrap">{renderRichText(item.trim())}</span>
+                          </div>
+                        )
+                      })}
                     </div>
                     {(editedReport.images?.length > 0 || (editedReport.imagePaths && editedReport.imagePaths.length > 0)) && (
                       <div className="grid grid-cols-2 gap-4 mt-4">
@@ -547,7 +635,7 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
                     rows={4}
                   />
                 ) : (
-                  <p className="text-gray-700 leading-relaxed text-sm">{editedReport.impact || 'No impact assessment provided.'}</p>
+                  <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">{renderRichText(editedReport.impact || 'No impact assessment provided.')}</p>
                 )}
               </section>
 
@@ -563,7 +651,7 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
                   />
                 ) : (
                   <div className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
-                    {editedReport.remediation || 'No remediation provided'}
+                    {renderRichText(editedReport.remediation || 'No remediation provided')}
                   </div>
                 )}
               </section>
@@ -580,7 +668,7 @@ export function PreviewPanel({ report, onReportChange }: PreviewPanelProps) {
                   />
                 ) : (
                   <div className="bg-gray-50 p-4 rounded border border-gray-300">
-                    <p className="text-gray-800 text-sm font-mono whitespace-pre-wrap">{editedReport.technicalDetails || 'No technical analysis provided.'}</p>
+                    <p className="text-gray-800 text-sm font-mono whitespace-pre-wrap">{renderRichText(editedReport.technicalDetails || 'No technical analysis provided.')}</p>
                   </div>
                 )}
               </section>
