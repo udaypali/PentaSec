@@ -39,7 +39,7 @@ CORS(
 
 try:
     configure_tesseract()
-except RuntimeError as e:
+except Exception as e:
     print(f"[WARNING] Tesseract setup failed: {e}")
     print("[WARNING] Image redaction features will be unavailable.")
 
