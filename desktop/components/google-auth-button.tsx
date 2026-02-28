@@ -47,13 +47,25 @@ export default function GoogleAuthButton() {
         };
     }, [isLoading, sessionId, router]);
 
-    const handleGoogleLogin = () => {
+    const handleGoogleLogin = async () => {
         // Generate unique session ID
         const newSessionId = Math.random().toString(36).substring(2) + Date.now().toString(36);
         setSessionId(newSessionId);
         setIsLoading(true);
 
-        const clientId = process.env.GOOGLE_CLIENT_ID;
+        // Fetch client ID from Render backend at runtime
+        let clientId: string;
+        try {
+            const res = await fetch(`${REMOTE_API}/api/auth/config`);
+            if (!res.ok) throw new Error('Failed to fetch auth config');
+            const config = await res.json();
+            clientId = config.googleClientId;
+        } catch (err) {
+            console.error('Could not fetch auth config:', err);
+            setIsLoading(false);
+            return;
+        }
+
         const redirectUri = `${REMOTE_API}/api/auth/callback/google`;
         const scope = "email profile openid";
         const responseType = "token id_token";

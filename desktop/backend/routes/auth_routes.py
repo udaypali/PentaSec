@@ -13,6 +13,14 @@ auth_bp = Blueprint('auth', __name__)
 # Falls back to in-memory dict if DB is unavailable
 oauth_tokens = {}
 
+@auth_bp.route('/api/auth/config', methods=['GET'])
+def auth_config():
+    """Return public OAuth configuration for the frontend."""
+    client_id = os.getenv('GOOGLE_CLIENT_ID')
+    if not client_id:
+        return jsonify({'error': 'Google Client ID not configured'}), 500
+    return jsonify({'googleClientId': client_id}), 200
+
 @auth_bp.route('/api/auth/signup', methods=['POST'])
 def signup():
     data = request.json
