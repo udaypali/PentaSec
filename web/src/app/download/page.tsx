@@ -60,7 +60,7 @@ export default function DownloadPage() {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full sm:w-auto">
                             <Button size="lg" className="h-14 px-8 text-lg font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all group" asChild>
-                                <a href="https://github.com/udaypali/PentaSec/releases/download/Pentasec/Pentasec-Setup.exe">
+                                <a href="https://github.com/udaypali/PentaSecWeb/releases/download/Pentasec/Pentasec-Setup.exe">
                                     <Download className="mr-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
                                     Download for Windows
                                 </a>
