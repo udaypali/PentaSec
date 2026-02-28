@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Shield, Lock, Mail } from 'lucide-react';
 import GoogleAuthButton from '@/components/google-auth-button';
+import { REMOTE_API } from '@/lib/api';
 
 export default function SignIn() {
     const router = useRouter();
@@ -20,7 +21,7 @@ export default function SignIn() {
         setIsLoading(true);
 
         try {
-            const res = await fetch('http://127.0.0.1:5000/api/auth/signin', {
+            const res = await fetch(`${REMOTE_API}/api/auth/signin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

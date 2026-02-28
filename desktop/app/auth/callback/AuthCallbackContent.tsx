@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, CheckCircle } from "lucide-react";
+import { REMOTE_API } from "@/lib/api";
 
 export default function AuthCallbackContent() {
     const router = useRouter();
@@ -41,7 +42,7 @@ export default function AuthCallbackContent() {
 
             try {
                 const res = await fetch(
-                    "http://127.0.0.1:5000/api/auth/google",
+                    `${REMOTE_API}/api/auth/google`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -66,7 +67,7 @@ export default function AuthCallbackContent() {
                 } else {
                     if (sessionId) {
                         await fetch(
-                            "http://127.0.0.1:5000/api/auth/oauth-store",
+                            `${REMOTE_API}/api/auth/oauth-store`,
                             {
                                 method: "POST",
                                 headers: {

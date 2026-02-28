@@ -199,7 +199,7 @@ export default function Page() {
             <PreviewPanel report={generatedReport} onReportChange={setGeneratedReport} />
           </div>
           <div className={currentPage === 'dashboard' ? 'contents' : 'hidden'}>
-            <Dashboard />
+            <Dashboard isActive={currentPage === 'dashboard'} />
           </div>
           <div className={currentPage === 'redaction' ? 'contents' : 'hidden'}>
             <AIRedaction onNavigate={() => setCurrentPage('settings')} />
@@ -208,7 +208,7 @@ export default function Page() {
             <EvidenceVault />
           </div>
           <div className={currentPage === 'archive' ? 'contents' : 'hidden'}>
-            <ReportArchive onEdit={handleEditDraft} />
+            <ReportArchive onEdit={handleEditDraft} isActive={currentPage === 'archive'} />
           </div>
           <div className={currentPage === 'settings' ? 'contents' : 'hidden'}>
             <SettingsPage />

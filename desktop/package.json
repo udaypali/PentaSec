@@ -97,10 +97,6 @@
         "filter": [
           "**/*"
         ]
-      },
-      {
-        "from": "backend/.env",
-        "to": "backend/.env"
       }
     ],
     "files": [

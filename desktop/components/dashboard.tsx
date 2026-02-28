@@ -44,12 +44,13 @@ interface Project {
     vulnerabilities: Vulnerability[];
 }
 
-export function Dashboard() {
+export function Dashboard({ isActive }: { isActive: boolean }) {
     const [timeRange, setTimeRange] = useState('week');
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        if (!isActive) return;
         const fetchProjects = async () => {
             try {
                 const res = await fetch('http://127.0.0.1:5000/api/projects');
@@ -64,7 +65,7 @@ export function Dashboard() {
             }
         };
         fetchProjects();
-    }, []);
+    }, [isActive]);
 
     // Calculate Stats
     const allVulns = projects.flatMap(p => p.vulnerabilities.map(v => ({ ...v, projectName: p.name })));

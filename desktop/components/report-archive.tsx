@@ -27,13 +27,13 @@ interface DraftReport {
 
 interface ReportArchiveProps {
     onEdit: (draft: DraftReport) => void;
+    isActive: boolean;
 }
 
-export function ReportArchive({ onEdit }: ReportArchiveProps) {
+export function ReportArchive({ onEdit, isActive }: ReportArchiveProps) {
     const [drafts, setDrafts] = useState<DraftReport[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Fetch drafts on load
     const fetchDrafts = async () => {
         try {
             const res = await fetch('http://127.0.0.1:5000/api/report-drafts');
@@ -47,8 +47,9 @@ export function ReportArchive({ onEdit }: ReportArchiveProps) {
     };
 
     useEffect(() => {
+        if (!isActive) return;
         fetchDrafts();
-    }, []);
+    }, [isActive]);
 
     const [deleteDraftId, setDeleteDraftId] = useState<string | null>(null);
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { REMOTE_API } from '@/lib/api';
 
 export default function GoogleAuthButton() {
     const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +17,7 @@ export default function GoogleAuthButton() {
         // Poll backend every second to check if token was stored by callback page
         const pollInterval = setInterval(async () => {
             try {
-                const res = await fetch(`http://127.0.0.1:5000/api/auth/oauth-retrieve/${sessionId}`);
+                const res = await fetch(`${REMOTE_API}/api/auth/oauth-retrieve/${sessionId}`);
                 if (res.ok) {
                     const data = await res.json();
                     clearInterval(pollInterval);
@@ -53,7 +54,7 @@ export default function GoogleAuthButton() {
         setIsLoading(true);
 
         const clientId = "790234405770-ehe4iki51f4ovhvqlj4sp14s8c2e7t8v.apps.googleusercontent.com";
-        const redirectUri = "http://127.0.0.1:5000/api/auth/callback/google";
+        const redirectUri = `${REMOTE_API}/api/auth/callback/google`;
         const scope = "email profile openid";
         const responseType = "token id_token";
         const nonce = Math.random().toString(36).substring(7);
