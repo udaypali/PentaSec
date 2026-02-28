@@ -10,7 +10,7 @@ interface VersionInfo {
 }
 
 const GITHUB_RELEASES_URL =
-    'https://github.com/udaypali/PentaSec/releases/latest';
+    'https://pentasec.vercel.app/download';
 
 export function VersionGate({ children }: { children: React.ReactNode }) {
     const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
