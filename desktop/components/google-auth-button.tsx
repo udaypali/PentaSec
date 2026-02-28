@@ -53,14 +53,14 @@ export default function GoogleAuthButton() {
         setSessionId(newSessionId);
         setIsLoading(true);
 
-        const clientId = "790234405770-ehe4iki51f4ovhvqlj4sp14s8c2e7t8v.apps.googleusercontent.com";
+        const clientId = process.env.GOOGLE_CLIENT_ID;
         const redirectUri = `${REMOTE_API}/api/auth/callback/google`;
         const scope = "email profile openid";
         const responseType = "token id_token";
         const nonce = Math.random().toString(36).substring(7);
 
         // Use state parameter to pass session ID (standard OAuth practice)
-        const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&nonce=${nonce}&state=${newSessionId}&prompt=select_account`;
+        const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${encodeURIComponent(scope)}&nonce=${nonce}&state=${newSessionId}&prompt=select_account`;
 
         // Check if running in Electron and open in external browser
         if (typeof window !== 'undefined' && window.api && window.api.openExternal) {
