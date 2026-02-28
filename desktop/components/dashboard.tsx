@@ -67,6 +67,17 @@ export function Dashboard({ isActive }: { isActive: boolean }) {
         fetchProjects();
     }, [isActive]);
 
+    // Force Recharts to unmount completely and remount with a tiny delay after data loads
+    const [renderCharts, setRenderCharts] = useState(false);
+    useEffect(() => {
+        if (isActive && !isLoading) {
+            const timer = setTimeout(() => setRenderCharts(true), 50);
+            return () => clearTimeout(timer);
+        } else {
+            setRenderCharts(false);
+        }
+    }, [isActive, isLoading]);
+
     // Calculate Stats
     const allVulns = projects.flatMap(p => p.vulnerabilities.map(v => ({ ...v, projectName: p.name })));
     const totalVulns = allVulns.length;
@@ -251,39 +262,43 @@ export function Dashboard({ isActive }: { isActive: boolean }) {
                                 </div>
                             </div>
                             <div className="flex-1 w-full min-h-0">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={activityData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                                        <XAxis
-                                            dataKey="name"
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
-                                            dy={10}
-                                        />
-                                        <YAxis
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
-                                        />
-                                        <Tooltip
-                                            cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
-                                            contentStyle={{
-                                                backgroundColor: '#0f172a', color: '#f8fafc',
-                                                borderColor: 'hsl(var(--border))',
-                                                borderRadius: '8px',
-                                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                                            }}
-                                            itemStyle={{ color: 'hsl(var(--foreground))' }}
-                                        />
-                                        <Bar
-                                            dataKey="count"
-                                            fill="hsl(var(--primary))"
-                                            radius={[4, 4, 0, 0]}
-                                            barSize={30}
-                                        />
-                                    </BarChart>
-                                </ResponsiveContainer>
+                                {renderCharts && (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={activityData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                                            <XAxis
+                                                dataKey="name"
+                                                axisLine={false}
+                                                tickLine={false}
+                                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                                                dy={10}
+                                            />
+                                            <YAxis
+                                                axisLine={false}
+                                                tickLine={false}
+                                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                                            />
+                                            <Tooltip
+                                                cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
+                                                contentStyle={{
+                                                    backgroundColor: '#0f172a', color: '#f8fafc',
+                                                    borderColor: 'hsl(var(--border))',
+                                                    borderRadius: '8px',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                                }}
+                                                itemStyle={{ color: 'hsl(var(--foreground))' }}
+                                            />
+                                            <Bar
+                                                key={`bar-activity-${isActive}`}
+                                                dataKey="count"
+                                                fill="hsl(var(--primary))"
+                                                radius={[4, 4, 0, 0]}
+                                                barSize={30}
+                                                isAnimationActive={true}
+                                            />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                )}
                             </div>
                         </div>
 
@@ -346,32 +361,36 @@ export function Dashboard({ isActive }: { isActive: boolean }) {
                                 <span className="text-3xl font-bold text-foreground">{statsData.total}</span>
                                 <span className="text-xs text-muted uppercase tracking-wider">Total</span>
                             </div>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={severityDistribution}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                    >
-                                        {severityDistribution.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: '#0f172a', color: '#f8fafc',
-                                            borderColor: 'hsl(var(--border))',
-                                            borderRadius: '8px',
-                                            zIndex: 100 // Ensure tooltip is on top if portal isn't used
-                                        }}
-                                        itemStyle={{ color: 'hsl(var(--foreground))' }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                            {renderCharts && (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            key={`pie-severity-${isActive}`}
+                                            data={severityDistribution}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            isAnimationActive={true}
+                                        >
+                                            {severityDistribution.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: '#0f172a', color: '#f8fafc',
+                                                borderColor: 'hsl(var(--border))',
+                                                borderRadius: '8px',
+                                                zIndex: 100 // Ensure tooltip is on top if portal isn't used
+                                            }}
+                                            itemStyle={{ color: 'hsl(var(--foreground))' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            )}
                         </div>
 
                         <div className="mt-4 space-y-2 shrink-0 overflow-y-auto max-h-[40%]">

@@ -133,12 +133,14 @@ export function EvidenceVault() {
     const [isNewProjectDialogOpen, setIsNewProjectDialogOpen] = useState(false);
     const [newProjectName, setNewProjectName] = useState('');
     const [newProjectDescription, setNewProjectDescription] = useState('');
+    const [newProjectError, setNewProjectError] = useState('');
 
     // New Vulnerability State
     const [isNewVulnDialogOpen, setIsNewVulnDialogOpen] = useState(false);
     const [newVulnName, setNewVulnName] = useState('');
     const [newVulnSeverity, setNewVulnSeverity] = useState<'Critical' | 'High' | 'Medium' | 'Low' | 'Info'>('Medium');
     const [newVulnDescription, setNewVulnDescription] = useState('');
+    const [newVulnError, setNewVulnError] = useState('');
 
     // Add Evidence State
     const [isAddEvidenceDialogOpen, setIsAddEvidenceDialogOpen] = useState(false);
@@ -292,22 +294,27 @@ export function EvidenceVault() {
                 setProjects([...projects, createdProject]);
                 setNewProjectName('');
                 setNewProjectDescription('');
+                setNewProjectError('');
                 setIsNewProjectDialogOpen(false);
             } else {
-                console.error("Failed to save project");
+                const errorData = await res.json();
+                setNewProjectError(errorData.error || "Failed to save project");
+                console.error("Failed to save project:", errorData);
             }
         } catch (e) {
             console.error("Error saving project:", e);
-            // Fallback for UI if backend is down (though optimal is to show error)
-            const fallbackProject: Project = {
-                id: Date.now().toString(),
-                name: newProjectName,
-                description: newProjectDescription,
-                createdDate: new Date().toISOString().split('T')[0],
-                vulnerabilities: []
-            };
-            setProjects([...projects, fallbackProject]);
-            setIsNewProjectDialogOpen(false);
+            // Only fallback if the error is a network error (not a validation error that we already handled)
+            if (!newProjectError) {
+                const fallbackProject: Project = {
+                    id: Date.now().toString(),
+                    name: newProjectName,
+                    description: newProjectDescription,
+                    createdDate: new Date().toISOString().split('T')[0],
+                    vulnerabilities: []
+                };
+                setProjects([...projects, fallbackProject]);
+                setIsNewProjectDialogOpen(false);
+            }
         }
     };
 
@@ -363,12 +370,18 @@ export function EvidenceVault() {
                 setNewVulnName('');
                 setNewVulnSeverity('Medium');
                 setNewVulnDescription('');
+                setNewVulnError('');
                 setIsNewVulnDialogOpen(false);
             } else {
-                console.error("Failed to save vulnerability");
+                const errorData = await res.json();
+                setNewVulnError(errorData.error || "Failed to save vulnerability");
+                console.error("Failed to save vulnerability:", errorData);
             }
         } catch (e) {
             console.error("Error saving vulnerability:", e);
+            if (!newVulnError) {
+                // local fallback code if preferred, or simply do nothing
+            }
         }
     };
 
@@ -994,6 +1007,11 @@ export function EvidenceVault() {
                                         Record a new vulnerability for this project.
                                     </DialogDescription>
                                 </DialogHeader>
+                                {newVulnError && (
+                                    <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-2">
+                                        {newVulnError}
+                                    </div>
+                                )}
                                 <div className="grid gap-4 py-4">
                                     <div className="grid gap-2">
                                         <Label htmlFor="vuln-name">Vulnerability Name</Label>
@@ -1215,6 +1233,11 @@ export function EvidenceVault() {
                                     Initialise a new security engagement project.
                                 </DialogDescription>
                             </DialogHeader>
+                            {newProjectError && (
+                                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-2">
+                                    {newProjectError}
+                                </div>
+                            )}
                             <div className="grid gap-4 py-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="name">Project Name</Label>

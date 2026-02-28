@@ -20,6 +20,11 @@ def add_project():
     if not new_project or 'name' not in new_project:
         return jsonify({"error": "Invalid project data"}), 400
         
+    new_project_name = new_project['name'].strip().lower()
+    for existing_project in data.get('projects', []):
+        if existing_project.get('name', '').strip().lower() == new_project_name:
+            return jsonify({"error": "A project with this name already exists"}), 400
+            
     if 'id' not in new_project:
         new_project['id'] = str(int(time.time() * 1000))
         
@@ -66,6 +71,13 @@ def add_vulnerability(project_id):
             
     if project_index == -1:
         return jsonify({"error": "Project not found"}), 404
+        
+    project = data['projects'][project_index]
+    new_vuln_name = new_vuln['name'].strip().lower()
+    
+    for existing_vuln in project.get('vulnerabilities', []):
+        if existing_vuln.get('name', '').strip().lower() == new_vuln_name:
+            return jsonify({"error": "A vulnerability with this name already exists in this project"}), 400
         
     if 'id' not in new_vuln:
         new_vuln['id'] = str(int(time.time() * 1000))
