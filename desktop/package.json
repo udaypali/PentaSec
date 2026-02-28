@@ -1,6 +1,8 @@
 {
   "name": "pentasec-desktop-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "description": "AI-powered penetration testing report generation and evidence management tool for security professionals.",
+  "author": "Uday Pali",
   "private": true,
   "main": "main.js",
   "scripts": {
@@ -78,7 +80,7 @@
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^40.1.0",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "^26.8.1",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",

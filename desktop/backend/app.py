@@ -13,7 +13,29 @@ from security import load_env
 load_env()
 
 app = Flask(__name__)
-CORS(app)
+
+# ---------------------------------------------------------------------------
+# CORS — restrict to an explicit allowlist.
+#
+# Locally the Electron renderer runs on file:// or http://localhost:<port>.
+# On Render, set the ALLOWED_ORIGINS env var to your real frontend URL(s),
+# e.g. "https://your-app.onrender.com,https://pentasec.app"
+#
+# Multiple origins: comma-separated, no spaces.
+# ---------------------------------------------------------------------------
+_raw_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000"
+)
+ALLOWED_ORIGINS = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+
+CORS(
+    app,
+    origins=ALLOWED_ORIGINS,
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+)
 
 try:
     configure_tesseract()

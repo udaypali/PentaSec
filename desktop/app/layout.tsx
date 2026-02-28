@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ExitButton } from '@/components/ExitButton';
 import { ThemeProvider } from '@/components/theme-provider';
+import { VersionGate } from '@/components/VersionGate';
 
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -45,7 +46,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <VersionGate>{children}</VersionGate>
         </ThemeProvider>
       </body>
     </html>

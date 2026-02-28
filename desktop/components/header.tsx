@@ -49,7 +49,7 @@ export function Header({ onPageChange }: HeaderProps = {}) {
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-primary rounded-full"></div>
           <h1 className="text-lg font-semibold text-foreground">PentaSec</h1>
-          <span className="text-xs text-muted px-2 py-1 bg-card rounded-md">v1.0.0</span>
+          <span className="text-xs text-muted px-2 py-1 bg-card rounded-md">v1.1.0</span>
         </div>
         <span className="text-xs text-muted">AI-Powered Pentest Reporting</span>
       </div>
