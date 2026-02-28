@@ -138,7 +138,7 @@ def google_callback():
         } 
         else if (idToken && sessionId) {
 
-            fetch('http://127.0.0.1:5000/api/auth/google', {
+            fetch('/api/auth/google', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: idToken })
@@ -147,7 +147,7 @@ def google_callback():
             .then(data => {
                 if (!data.token) throw new Error(data.error || 'Validation failed');
 
-                return fetch('http://127.0.0.1:5000/api/auth/oauth-store', {
+                return fetch('/api/auth/oauth-store', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
