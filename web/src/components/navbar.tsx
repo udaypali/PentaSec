@@ -74,13 +74,13 @@ export function Navbar({ className }: { className?: string }) {
 
             <div className={cn(
                 // Base styles
-                "fixed p-2 md:p-3 bg-background/80 backdrop-blur-md shadow-xl z-50 transition-all duration-300 border-border/40",
+                "absolute p-2 md:p-3 bg-background/80 backdrop-blur-md shadow-xl z-50 transition-all duration-300 border-border/40",
                 // Mobile styles
                 "top-4 left-[76px] w-max max-w-[calc(100vw-5rem)] rounded-2xl border flex flex-row items-center gap-1 sm:gap-2",
                 // Overflow handling for small devices
                 "overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
                 // Desktop styles
-                "md:fixed md:top-1/2 md:left-0 md:-translate-y-1/2 md:mt-0 md:rounded-r-2xl md:rounded-l-none md:border-y md:border-r md:border-l-0 md:flex-col md:overflow-visible md:w-auto md:h-auto",
+                "md:absolute md:top-[50vh] md:left-0 md:-translate-y-1/2 md:mt-0 md:rounded-r-2xl md:rounded-l-none md:border-y md:border-r md:border-l-0 md:flex-col md:overflow-visible md:w-auto md:h-auto",
                 // Visibility transition
                 isOpen ? "translate-x-0 opacity-100 scale-100" : "-translate-x-4 opacity-0 scale-95 md:translate-x-0 md:opacity-100 md:scale-100",
                 className

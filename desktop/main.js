@@ -107,6 +107,26 @@ function createWindow() {
         mainWindow.loadURL("app://index.html");
     }
 
+    // Disable DevTools and Reload shortcuts in production
+    mainWindow.webContents.on("before-input-event", (event, input) => {
+        if (!isDev) {
+            const isInspectElement =
+                (input.control && input.shift && input.key.toLowerCase() === "i") ||
+                input.key === "F12" ||
+                (input.meta && input.alt && input.key.toLowerCase() === "i");
+
+            const isReload =
+                (input.control && input.key.toLowerCase() === "r") ||
+                (input.control && input.shift && input.key.toLowerCase() === "r") ||
+                (input.meta && input.key.toLowerCase() === "r") ||
+                input.key === "F5";
+
+            if (isInspectElement || isReload) {
+                event.preventDefault();
+            }
+        }
+    });
+
     mainWindow.on("close", () => {
         stopBackend();
     });

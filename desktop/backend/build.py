@@ -36,6 +36,8 @@ def build():
         APP_NAME,
         "--add-data",
         ".env;.",
+        "--icon",
+        "../public/logo.ico",
         ENTRY_FILE,
     ]
 

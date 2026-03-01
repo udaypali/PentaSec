@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Github, Instagram, Linkedin, Hexagon, Globe, Lock, Zap } from "lucide-react"
+import { Github, Instagram, Linkedin, Globe, Lock, Zap, Shield } from "lucide-react"
 
 export function Footer() {
     return (
@@ -20,11 +20,11 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
                     {/* Brand Column */}
                     <div className="md:col-span-5 space-y-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/40">
-                                <Hexagon className="w-5 h-5 text-primary" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent-secondary flex items-center justify-center flex-shrink-0">
+                                <Shield className="w-5 h-5 text-background" />
                             </div>
-                            <span className="text-xl font-bold text-white tracking-wider italic">PENTASEC</span>
+                            <span className="font-bold text-xl text-foreground">PentaSec</span>
                         </div>
                         <p className="text-zinc-500 max-w-sm leading-relaxed">
                             Automating pentest reporting for the modern security professional. Built by researchers, for researchers.
