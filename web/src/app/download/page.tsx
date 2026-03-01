@@ -49,7 +49,7 @@ export default function DownloadPage() {
                 <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                     <div className="flex flex-col items-start space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         <Badge variant="secondary" className="px-3 py-1 text-sm border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-default">
-                            v1.0.0 • Latest Release
+                            v1.1.0 • Latest Release
                         </Badge>
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
                             Secure. <br />
@@ -182,6 +182,44 @@ export default function DownloadPage() {
                     </div>
                 </section>
 
+                {/* 4. WHAT'S NEW SECTION */}
+                <section id="changelog" className="space-y-8 pt-8">
+                    <div className="text-center space-y-4">
+                        <h2 className="text-3xl md:text-3xl font-bold">What's New</h2>
+                        <p className="text-muted-foreground max-w-2xl mx-auto">See what has changed in the latest version.</p>
+                    </div>
+
+                    <Card className="border-border/50 bg-card/20 hover:bg-card/30 transition-all duration-300 max-w-4xl mx-auto">
+                        <CardHeader className="border-b border-border/50 bg-muted/20 pb-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle className="text-xl flex items-center gap-2">
+                                        <Terminal className="w-5 h-5 text-primary" />
+                                        Version 1.1.0
+                                    </CardTitle>
+                                    <CardDescription className="mt-1">Latest Release</CardDescription>
+                                </div>
+                                <Badge variant="outline" className="text-primary border-primary/30 bg-primary/5">Latest</Badge>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="pt-6 space-y-6">
+                            <div className="space-y-3">
+                                <h4 className="font-semibold text-foreground flex items-center gap-2">
+                                    <Zap className="w-4 h-4 text-green-500" />
+                                    Changes & Improvements
+                                </h4>
+                                <ul className="space-y-2 ms-6 text-muted-foreground list-disc marker:text-primary/50 text-base">
+                                    <li><strong className="text-foreground/90">Backend Auth Migration:</strong> Backend Auth has been shifted to the Render backend server.</li>
+                                    <li><strong className="text-foreground/90">App Versioning System:</strong> New App versioning system has been added and migrated to the Render backend server.</li>
+                                    <li><strong className="text-foreground/90">Environment Variables Update:</strong> There is no longer a <code className="text-primary bg-primary/10 px-1 py-0.5 rounded text-sm">.env</code> file in the backend folder.</li>
+                                    <li><strong className="text-foreground/90">Security Cleanup:</strong> All older secrets and credentials have been deleted or are out of use in the new app.</li>
+                                    <li><strong className="text-foreground/90">Version Deprecation:</strong> Version 1.0.0 is now discontinued.</li>
+                                </ul>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </section>
+
                 {/* 4. BOTTOM CPA */}
                 <section className="py-12 flex flex-col items-center text-center space-y-8 relative">
                     {/* Background glow for CTA */}
@@ -193,13 +231,15 @@ export default function DownloadPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button size="lg" className="h-12 px-8 text-lg font-semibold shadow-lg shadow-primary/25" asChild>
-                            <a href="https://github.com/udaypali/PentaSec/releases/download/Pentasec/Pentasec-Setup.exe">
+                            <a href="https://github.com/udaypali/PentaSecWeb/releases/download/Pentasec/Pentasec-Setup.exe">
                                 <Download className="mr-2 w-5 h-5" />
                                 Download (.exe)
                             </a>
                         </Button>
-                        <Button variant="ghost" className="h-12 px-8 text-lg hover:bg-muted/50">
-                            View Full Changelog
+                        <Button variant="ghost" className="h-12 px-8 text-lg hover:bg-muted/50" asChild>
+                            <a href="#changelog">
+                                View Full Changelog
+                            </a>
                         </Button>
                     </div>
 
