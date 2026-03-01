@@ -137,4 +137,4 @@ If you discover a security vulnerability, please see [SECURITY.md](SECURITY.md) 
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This project is licensed under the GNU General Public License v3.0 (GPLv3). See [LICENSE](LICENSE) for details.
