@@ -60,7 +60,7 @@ export default function DownloadPage() {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full sm:w-auto">
                             <Button size="lg" className="h-14 px-8 text-lg font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all group" asChild>
-                                <a href="https://github.com/udaypali/PentaSecWeb/releases/download/Pentasec/Pentasec-Setup.exe">
+                                <a href="https://github.com/udaypali/PentaSec/releases/download/Pentasec/Pentasec-Setup-v1.1.0.exe">
                                     <Download className="mr-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
                                     Download for Windows
                                 </a>
@@ -128,7 +128,7 @@ export default function DownloadPage() {
                                 <span className="font-medium">Verification (SHA-256)</span>
                             </div>
                             <p className="text-xs font-mono text-muted-foreground break-all opacity-70 group-hover:opacity-100 transition-opacity">
-                                2376f5e52dee354dda3b10c44323c0852241d22638a60d0c80365568690966dd
+                                3de9e0caab12f984586ca68d0a8b048479899a3bacb51ea04677bf9d8db0fd69
                             </p>
                             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
@@ -231,7 +231,7 @@ export default function DownloadPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button size="lg" className="h-12 px-8 text-lg font-semibold shadow-lg shadow-primary/25" asChild>
-                            <a href="https://github.com/udaypali/PentaSecWeb/releases/download/Pentasec/Pentasec-Setup.exe">
+                            <a href="https://github.com/udaypali/PentaSec/releases/download/Pentasec/Pentasec-Setup-v1.1.0.exe">
                                 <Download className="mr-2 w-5 h-5" />
                                 Download (.exe)
                             </a>
