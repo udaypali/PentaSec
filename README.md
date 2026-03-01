@@ -98,27 +98,98 @@ This produces platform-specific installers in the `release/` directory.
 
 ```
 pentasec/
-├── web/                    # Next.js web application
+├── web/                          # Next.js web application
 │   ├── src/
-│   │   ├── app/            # App router pages & API routes
-│   │   ├── components/     # React components
-│   │   ├── hooks/          # Custom hooks
-│   │   ├── lib/            # Utilities (MongoDB client, helpers)
-│   │   └── types/          # TypeScript type definitions
-│   └── public/             # Static assets
+│   │   ├── app/                  # App router pages
+│   │   │   ├── about/
+│   │   │   ├── api/              # API routes
+│   │   │   ├── contact/
+│   │   │   ├── dashboard/
+│   │   │   ├── docs/
+│   │   │   ├── download/
+│   │   │   ├── login/
+│   │   │   ├── signup/
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── globals.css
+│   │   ├── components/           # React components
+│   │   │   ├── ui/               # shadcn/ui components
+│   │   │   ├── ai-demo.tsx
+│   │   │   ├── before-after-slider.tsx
+│   │   │   ├── docs-sidebar.tsx
+│   │   │   ├── faq.tsx
+│   │   │   ├── features.tsx
+│   │   │   ├── footer.tsx
+│   │   │   ├── hero.tsx
+│   │   │   ├── navbar.tsx
+│   │   │   ├── security.tsx
+│   │   │   ├── testimonials.tsx
+│   │   │   ├── workflow.tsx
+│   │   │   └── ...
+│   │   ├── hooks/                # Custom hooks
+│   │   │   └── use-unicorn-studio.ts
+│   │   ├── lib/                  # Utilities
+│   │   │   ├── mongodb.ts
+│   │   │   └── utils.ts
+│   │   └── types/                # TypeScript type definitions
+│   │       └── next-auth.d.ts
+│   ├── public/                   # Static assets
+│   ├── .env.example
+│   ├── next.config.ts
+│   ├── package.json
+│   └── tsconfig.json
 │
-├── desktop/                # Electron desktop application
-│   ├── app/                # Next.js pages for Electron renderer
-│   ├── backend/            # Python Flask backend
-│   │   ├── routes/         # API route handlers
-│   │   ├── app.py          # Flask entry point
-│   │   ├── config.py       # Path configuration
-│   │   ├── database.py     # MongoDB operations
-│   │   ├── encryption.py   # AES-256-GCM encryption
-│   │   └── utils.py        # Helpers and AI integration
-│   ├── components/         # React components
-│   ├── main.js             # Electron main process
-│   └── preload.js          # Electron preload script
+├── desktop/                      # Electron desktop application
+│   ├── app/                      # Next.js pages for Electron
+│   │   ├── auth/
+│   │   │   ├── callback/
+│   │   │   └── signin/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── globals.css
+│   ├── backend/                  # Python Flask backend
+│   │   ├── routes/               # API route handlers
+│   │   │   ├── ai_routes.py
+│   │   │   ├── auth_routes.py
+│   │   │   ├── project_routes.py
+│   │   │   ├── report_routes.py
+│   │   │   ├── settings_routes.py
+│   │   │   └── status_routes.py
+│   │   ├── app.py                # Flask entry point
+│   │   ├── build.py              # Build script
+│   │   ├── config.py             # Path configuration
+│   │   ├── database.py           # Database operations
+│   │   ├── encryption.py         # AES-256-GCM encryption
+│   │   ├── security.py           # Security utilities
+│   │   ├── tesseract_config.py   # OCR configuration
+│   │   ├── utils.py              # AI integration & helpers
+│   │   ├── version.py            # Version management
+│   │   ├── requirements.txt
+│   │   └── .env.example
+│   ├── components/               # React components
+│   │   ├── ui/                   # shadcn/ui components (50+)
+│   │   ├── sidebar.tsx
+│   │   ├── dashboard.tsx
+│   │   ├── evidence-vault.tsx
+│   │   ├── preview-panel.tsx
+│   │   ├── settings-page.tsx
+│   │   ├── report-archive.tsx
+│   │   ├── ai-redaction.tsx
+│   │   ├── header.tsx
+│   │   ├── main-content.tsx
+│   │   └── ...
+│   ├── hooks/                    # Custom hooks
+│   │   ├── use-mobile.ts
+│   │   └── use-toast.ts
+│   ├── lib/                      # Utilities
+│   │   ├── api.ts
+│   │   └── utils.ts
+│   ├── styles/                   # Additional styles
+│   ├── main.js                   # Electron main process
+│   ├── preload.js                # Electron preload script
+│   ├── electron.d.ts             # Electron types
+│   ├── next.config.mjs
+│   └── package.json
 │
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
