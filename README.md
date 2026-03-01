@@ -4,7 +4,7 @@ Pentest reporting made effortless. Pentasec is an open-source penetration testin
 
 ## What's New
 
-See [WHAT'S_NEW.md](WHAT'S_NEW.md) for the latest updates and release notes.
+See [CHANGELOG.md](CHANGELOG.md) for the latest updates and release notes.
 
 ## Overview
 
