@@ -2,9 +2,11 @@ import json
 import io
 import PIL.Image
 import PIL.ImageDraw
+import PIL.ImageEnhance
+import pytesseract
+from pytesseract import Output
 from flask import Blueprint, jsonify, request, send_file
 import google.generativeai as genai
-
 from database import db
 from utils import token_required, get_ai_model, increment_user_stat
 
@@ -118,6 +120,7 @@ def generate_report_api(current_user):
 @token_required
 def redact_image(current_user):
     try:
+        # 1. File Handling
         if 'file' not in request.files:
             return jsonify({"error": "No file part"}), 400
         file = request.files['file']
@@ -127,37 +130,56 @@ def redact_image(current_user):
         image_bytes = file.read()
         image = PIL.Image.open(io.BytesIO(image_bytes))
         
-        db.increment_usage(current_user['email'], 'image_count')
-        
-        import pytesseract
-        from pytesseract import Output
-        
+        # Wrapped in try/except to prevent database hiccups from killing the request
         try:
-            ocr_data = pytesseract.image_to_data(image, output_type=Output.DICT)
+            db.increment_usage(current_user['email'], 'image_count')
+        except Exception as db_err:
+            print(f"WARNING: Could not increment usage, DB error: {db_err}")
+
+        # 2. OCR Extraction (Optimized with Preprocessing)
+        try:
+            # --- PREPROCESSING START ---
+            # Create a high-contrast grayscale copy just for Tesseract
+            gray_image = image.convert('L')
+            enhancer = PIL.ImageEnhance.Contrast(gray_image)
+            contrast_image = enhancer.enhance(2.5) # Boost contrast by 250%
+            # --- PREPROCESSING END ---
+
+            custom_config = r'--oem 3 --psm 11'
+            # CRITICAL: Feed 'contrast_image' to pytesseract, not 'image'
+            ocr_data = pytesseract.image_to_data(contrast_image, output_type=Output.DICT, config=custom_config)
             full_text = " ".join([word for word in ocr_data['text'] if word.strip()])
             print(f"DEBUG: OCR extracted {len(full_text)} chars.")
         except Exception as e:
              print(f"DEBUG: OCR failed: {e}")
              return jsonify({"error": f"OCR failed: {str(e)}"}), 500
 
+        # 3. LLM Prompting (Updated for BOTH Web UI and API Traffic)
         prompt = f"""
-        You are a security redaction engine.
+        You are a highly precise security redaction engine.
         
         Analyze the following text extracted from an image (OCR output).
-        Identify ALL sensitive information that must be redacted.
+        Identify ONLY the highly sensitive values that must be redacted. This image may be a web browser screenshot or an API testing tool.
         
         TEXT TO ANALYZE:
         \"\"\"{full_text}\"\"\"
         
-        SENSITIVE DATA CATEGORIES:
-        - PII (Names, emails, phones, addresses)
-        - Secrets (Passwords, API keys, tokens)
-        - Network (IPs, internal URLs)
-        - Evidence (Payloads, headers, cookies)
+        STRICT REDACTION RULES - REDACT THESE:
+        - Target Routing: Host headers (including ports like localhost:8080 or localhost:5173), target URLs, domain names, IP addresses, and specific API endpoint paths.
+        - Web Browser Data: User-generated search queries or specific interests visible in browser tabs (e.g., tab titles showing search history).
+        - Specific PII: Full names, email addresses, phone numbers, physical addresses.
+        - Secret values: Passwords, hashes, API keys, JWTs, Bearer tokens, Session IDs.
+        
+        EXCLUSIONS - DO NOT REDACT THESE:
+        - Generic Web UI: Standard page text (e.g., "Welcome Back", "Sign In"), generic form labels (e.g., "STUDENT ID", "PASSWORD"), generic footers, and system/taskbar icons.
+        - Standard Web/API Protocols: HTTP methods and versions (GET, POST, HTTP/1.1, 200).
+        - Standard HTTP Headers & Common Values: (e.g., Date, timezones like GMT, User-Agent, Accept, Content-Type, Content-Length, Connection, Sec-Fetch-*).
+        - JSON structural keys: (e.g., do not redact the word "firstName", only redact the value).
+        - Standard integers, boolean values, or empty fields (e.g., id "1", semester "5", marks "100.0").
         
         OUTPUT FORMAT (STRICT JSON):
-        Return a JSON object with a list of EXACT strings to redact found in the text.
-        Do not include surrounding text.
+        Return a JSON object containing a list of EXACT isolated strings to redact. 
+        CRITICAL: Only return the specific sensitive value. Do NOT include surrounding text or full lines. 
         {{
             "sensitive_segments": [
                 "exact_string_1",
@@ -179,42 +201,103 @@ def redact_image(current_user):
             
         try:
             analysis = json.loads(response_text)
-            sensitive_segments = analysis.get("sensitive_segments", [])
+            raw_segments = analysis.get("sensitive_segments", [])
+            sensitive_segments = [s.strip() for s in raw_segments if s.strip()]
             print(f"DEBUG: Found {len(sensitive_segments)} segments to redact.")
         except json.JSONDecodeError:
              print(f"DEBUG: JSON parse failed: {response_text}")
              return jsonify({"error": "Failed to parse AI response"}), 500
 
-        draw = PIL.ImageDraw.Draw(image)
+        # 4. Bounding Box Logic & Safe Matching
         width, height = image.size
-        
         n_boxes = len(ocr_data['text'])
         
         def is_sensitive(word):
-            if len(word) < 2: return False
+            clean_word = word.strip('",:;{}[]()\'-/|').lower()
+            if len(clean_word) < 4: # Ignore tiny 1-3 letter words to prevent false positives like "to" or "vs"
+                return False
+                
+            w_lower = word.lower()
+            
             for segment in sensitive_segments:
-                if word.lower() in segment.lower() or segment.lower() in word.lower():
+                s_lower = segment.lower()
+                clean_segment = segment.strip('",:;{}[]()\'-/|').lower()
+                
+                # Condition A: Exact match
+                if clean_word == clean_segment:
                     return True
+                    
+                # Condition B: The OCR word is INSIDE the AI segment 
+                # e.g., OCR is "jupyter", AI segment is "jupyter notebook" -> MATCH!
+                if clean_word in clean_segment:
+                    return True
+                    
+                # Condition C: OCR Typo Safety Net for massive secrets (Hashes, URLs)
+                # e.g., OCR is "localhost:5173", AI is "5173" -> MATCH!
+                if len(s_lower) > 20 and len(clean_word) >= 4 and clean_word in s_lower:
+                    return True
+                    
             return False
 
+        # --- COLLECT BOXES ---
+        boxes_to_draw = []
         for i in range(n_boxes):
             if int(ocr_data['conf'][i]) > 0:                   
                 word = ocr_data['text'][i].strip()
                 if not word: continue
                 
                 if is_sensitive(word):
-                    x, y, w, h = ocr_data['left'][i], ocr_data['top'][i], ocr_data['width'][i], ocr_data['height'][i]
-                    
-                    pad_x = 5
-                    pad_y = 5
-                    
-                    x = max(0, x - pad_x)
-                    y = max(0, y - pad_y)
-                    w = min(width - x, w + pad_x * 2)
-                    h = min(height - y, h + pad_y * 2)
-                    
-                    draw.rectangle([x, y, x + w, y + h], fill="black")
+                    x, y = ocr_data['left'][i], ocr_data['top'][i]
+                    w, h = ocr_data['width'][i], ocr_data['height'][i]
+                    boxes_to_draw.append({'x1': x, 'y1': y, 'x2': x + w, 'y2': y + h})
+
+        # 5. Box Merging (Fixes the "Swiss Cheese" effect)
+        merged_boxes = []
+        if boxes_to_draw:
+            # Sort boxes top-to-bottom, then left-to-right
+            boxes_to_draw.sort(key=lambda b: (b['y1'], b['x1']))
+            
+            current_box = boxes_to_draw[0].copy()
+            # BUMPED thresholds to ensure hashes and long URLs bridge together properly
+            merge_threshold_x = 80  
+            merge_threshold_y = 12  
+            
+            for next_box in boxes_to_draw[1:]:
+                if (abs(current_box['y1'] - next_box['y1']) <= merge_threshold_y) and \
+                   (next_box['x1'] - current_box['x2'] <= merge_threshold_x):
+                    # Expand current box
+                    current_box['x2'] = max(current_box['x2'], next_box['x2'])
+                    current_box['y1'] = min(current_box['y1'], next_box['y1'])
+                    current_box['y2'] = max(current_box['y2'], next_box['y2'])
+                else:
+                    merged_boxes.append(current_box)
+                    current_box = next_box.copy()
+            merged_boxes.append(current_box)
+
+        # 6. Draw Final Redactions
+        draw = PIL.ImageDraw.Draw(image)
+        pad_x, pad_y = 5, 5
+        
+        for box in merged_boxes:
+            rect_x1 = max(0, box['x1'] - pad_x)
+            rect_y1 = max(0, box['y1'] - pad_y)
+            rect_x2 = min(width, box['x2'] + pad_x)
+            rect_y2 = min(height, box['y2'] + pad_y)
+
+            # Check if area is already manually redacted to save processing
+            try:
+                region = image.crop((rect_x1, rect_y1, rect_x2, rect_y2)).convert("L")
+                pixels = list(region.getdata())
+                if len(pixels) > 0:
+                    dark_pixels = sum(1 for p in pixels if p < 50)
+                    if (dark_pixels / len(pixels)) > 0.8:
+                        continue
+            except Exception as e:
+                print(f"DEBUG: Error checking region darkness: {e}")
+            
+            draw.rectangle([rect_x1, rect_y1, rect_x2, rect_y2], fill="black")
                 
+        # 7. Return the Processed Image
         output_buffer = io.BytesIO()
         image.save(output_buffer, format=image.format if image.format else 'PNG')
         output_buffer.seek(0)
