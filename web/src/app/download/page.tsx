@@ -22,7 +22,8 @@ import {
     CheckCircle2,
     ArrowRight,
     FileText,
-    Terminal
+    Terminal,
+    Info
 } from "lucide-react"
 
 export default function DownloadPage() {
@@ -70,6 +71,10 @@ export default function DownloadPage() {
                                     View Documentation
                                 </a>
                             </Button>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground bg-primary/5 border border-primary/20 px-5 py-4 rounded-xl mt-4 w-full max-w-lg shadow-sm">
+                            <Info className="w-5 h-5 text-primary shrink-0" />
+                            <p>Please <a href="/signup" className="text-primary hover:underline font-medium">create an account</a> on the web platform before logging into the desktop application.</p>
                         </div>
                     </div>
 
@@ -241,6 +246,10 @@ export default function DownloadPage() {
                                 View Full Changelog
                             </a>
                         </Button>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground bg-primary/5 border border-primary/20 px-5 py-4 rounded-xl max-w-lg shadow-sm mt-4 text-left">
+                        <Info className="w-5 h-5 text-primary shrink-0" />
+                        <p>Please <a href="/signup" className="text-primary hover:underline font-medium">create an account</a> on the web platform before logging into the desktop application.</p>
                     </div>
 
                 </section>
