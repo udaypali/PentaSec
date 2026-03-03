@@ -34,16 +34,22 @@ The main dashboard provides an overview of all your pentest projects and recent 
 Organize and manage all your pentest evidence including screenshots, logs, and findings in one secure location.
 
 ![Evidence Vault 1](docs/images/evidence-vault-1.png)
+
 ![Evidence Vault 2](docs/images/evidence-vault-2.png)
+
 ![Evidence Vault 3](docs/images/evidence-vault-3.png)
+
 ![Evidence Vault 4](docs/images/evidence-vault-4.png)
+
 ![Evidence Vault 5](docs/images/evidence-vault-5.png)
+
 ![Evidence Vault 6](docs/images/evidence-vault-6.png)
 
 ### AI-Powered Report Generation
 Leverage Google Gemini AI to automatically generate detailed, professional vulnerability reports from your findings.
 
 ![AI Report Generation 1](docs/images/ai-report-generation-1.png)
+
 ![AI Report Generation 2](docs/images/ai-report-generation-2.png)
 
 ### AI Redaction
