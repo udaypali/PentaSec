@@ -23,6 +23,38 @@ Pentasec consists of two applications:
 - **Report Archive** -- Store and browse historical reports.
 - **Local Encryption** -- AES-256-GCM encryption for all sensitive local data.
 
+## Screenshots
+
+### Dashboard
+The main dashboard provides an overview of all your pentest projects and recent activity.
+
+![Dashboard](docs/images/dashboard.png)
+
+### Evidence Vault
+Organize and manage all your pentest evidence including screenshots, logs, and findings in one secure location.
+
+![Evidence Vault](docs/images/evidence-vault.png)
+
+### AI-Powered Report Generation
+Leverage Google Gemini AI to automatically generate detailed, professional vulnerability reports from your findings.
+
+![AI Report Generation](docs/images/ai-report-generation.png)
+
+### AI Redaction
+Automatically detect and redact sensitive information like credentials, PII, and confidential data from your reports and screenshots.
+
+![AI Redaction](docs/images/ai-redaction.png)
+
+### Project Management
+Create, organize, and track all your penetration testing engagements with an intuitive project management interface.
+
+![Project Management](docs/images/project-management.png)
+
+### PDF Export
+Generate professional PDF reports ready for client delivery with customizable templates and formatting.
+
+![PDF Export](docs/images/pdf-export.png)
+
 ## Tech Stack
 
 | Layer | Technology |
