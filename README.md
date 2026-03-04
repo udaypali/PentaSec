@@ -6,6 +6,21 @@ Pentest reporting made effortless. Pentasec is an open-source penetration testin
 
 See [CHANGELOG.md](CHANGELOG.md) for the latest updates and release notes.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+  - [Web App](#web-app)
+  - [Desktop App](#desktop-app)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
+
 ## Overview
 
 Pentasec consists of two applications:
