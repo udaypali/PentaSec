@@ -2,6 +2,13 @@
 
 Pentest reporting made effortless. Pentasec is an open-source penetration testing reporting and evidence management tool that helps security professionals generate professional vulnerability reports with AI assistance.
 
+### ⚠ Cold Start Notice
+
+The backend is hosted on a free-tier server.  
+If the service has been idle, the first request may take 10–60 seconds to respond due to cold start behavior.
+
+Subsequent requests will respond normally.
+
 ## What's New
 
 See [CHANGELOG.md](CHANGELOG.md) for the latest updates and release notes.
