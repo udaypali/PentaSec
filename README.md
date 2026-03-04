@@ -130,12 +130,65 @@ python app.py --no-electron
 
 ### Building the Desktop App
 
+**Important:** Always compile the backend first before building the main application.
+
+#### Windows Setup and Build
+
+1. Clone the repository and install dependencies:
+
 ```bash
+git clone <repository-url>
 cd desktop
+npm install
+```
+
+2. Build the backend:
+
+```bash
+cd backend
+pip install -r requirements.txt
+python build.py
+```
+
+This creates `backend.exe` in `desktop/backend/dist/`.
+
+3. Move back to the root and build the main application:
+
+```bash
+cd ..
 npm run dist
 ```
 
-This produces platform-specific installers in the `release/` directory.
+This produces the Windows installer `Pentasec-Setup.exe` in the `release/` directory.
+
+#### Linux Setup and Build
+
+1. Clone the repository and install dependencies:
+
+```bash
+git clone <repository-url>
+cd desktop
+npm install electron
+```
+
+2. Build the backend:
+
+```bash
+cd backend
+pip install -r requirements.txt
+python build.py
+```
+
+This creates the `backend` executable in `desktop/backend/dist/`.
+
+3. Move back to the root and build the main application:
+
+```bash
+cd ..
+npm run dist
+```
+
+This produces the Linux AppImage `Pentasec-Setup.AppImage` in the `release/` directory.
 
 ## Project Structure
 
