@@ -3,6 +3,7 @@
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import {
     Card,
@@ -23,7 +24,8 @@ import {
     ArrowRight,
     FileText,
     Terminal,
-    Info
+    Info,
+    Laptop
 } from "lucide-react"
 
 export default function DownloadPage() {
@@ -61,9 +63,9 @@ export default function DownloadPage() {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full sm:w-auto">
                             <Button size="lg" className="h-14 px-8 text-lg font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all group" asChild>
-                                <a href="https://github.com/udaypali/PentaSec/releases/download/v1.1.0/Pentasec-Setup-v1.1.0.exe">
+                                <a href="#downloads">
                                     <Download className="mr-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
-                                    Download for Windows
+                                    Download Pentasec
                                 </a>
                             </Button>
                             <Button size="lg" variant="outline" className="h-14 px-8 text-lg bg-background/50 backdrop-blur-sm hover:bg-accent/50" asChild>
@@ -107,37 +109,115 @@ export default function DownloadPage() {
                     </div>
                 </section>
 
-                {/* 2. SYSTEM REQUIREMENTS */}
-                <section className="space-y-8">
-                    <h2 className="text-2xl font-bold text-center">System Requirements</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="p-6 rounded-xl border border-border/50 bg-card/30 flex flex-col gap-2 hover:bg-card/50 transition-colors">
-                            <div className="flex items-center gap-3 text-primary mb-2">
-                                <Monitor className="w-5 h-5" />
-                                <span className="font-medium">OS Support</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Windows 10 & 11 (64-bit)</p>
-                        </div>
-
-                        <div className="p-6 rounded-xl border border-border/50 bg-card/30 flex flex-col gap-2 hover:bg-card/50 transition-colors">
-                            <div className="flex items-center gap-3 text-primary mb-2">
-                                <HardDrive className="w-5 h-5" />
-                                <span className="font-medium">File Size</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">270 MB</p>
-                        </div>
-
-                        <div className="p-6 rounded-xl border border-border/50 bg-card/30 flex flex-col gap-2 hover:bg-card/50 transition-colors relative group overflow-hidden">
-                            <div className="flex items-center gap-3 text-primary mb-2">
-                                <ShieldCheck className="w-5 h-5" />
-                                <span className="font-medium">Verification (SHA-256)</span>
-                            </div>
-                            <p className="text-xs font-mono text-muted-foreground break-all opacity-70 group-hover:opacity-100 transition-opacity">
-                                3de9e0caab12f984586ca68d0a8b048479899a3bacb51ea04677bf9d8db0fd69
-                            </p>
-                            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
+                {/* 2. DOWNLOADS SECTION */}
+                <section id="downloads" className="space-y-8 pt-8 scroll-mt-24">
+                    <div className="text-center space-y-4">
+                        <h2 className="text-3xl md:text-4xl font-bold">Choose Your Platform</h2>
+                        <p className="text-muted-foreground flex items-center justify-center gap-2">
+                            Download the right version for your operating system.
+                        </p>
                     </div>
+
+                    <Tabs defaultValue="windows" className="w-full flex flex-col items-center mt-2">
+                        <TabsList className="grid w-full max-w-md grid-cols-3 h-14 mb-8 bg-muted/40 border border-border/50 rounded-xl p-1 shadow-sm">
+                            <TabsTrigger value="windows" className="flex items-center gap-2 text-sm sm:text-base h-full rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
+                                <Monitor className="w-4 h-4 hidden sm:block" /> Windows
+                            </TabsTrigger>
+                            <TabsTrigger value="linux" className="flex items-center gap-2 text-sm sm:text-base h-full rounded-lg data-[state=active]:bg-orange-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
+                                <Terminal className="w-4 h-4 hidden sm:block" /> Linux
+                            </TabsTrigger>
+                            <TabsTrigger value="macos" className="flex items-center gap-2 text-sm sm:text-base h-full rounded-lg data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
+                                <Laptop className="w-4 h-4 hidden sm:block" /> macOS
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <div className="w-full max-w-4xl relative min-h-[220px]">
+                            {/* Windows */}
+                            <TabsContent value="windows" className="mt-0 outline-none focus-visible:ring-0">
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col md:flex-row gap-6 items-center justify-between p-6 md:p-8 rounded-2xl border border-blue-500/20 bg-blue-500/5 shadow-[0_4px_30px_-5px_rgba(59,130,246,0.15)] ring-1 ring-inset ring-blue-500/10 hover:bg-blue-500/10 transition-colors">
+                                    <div className="flex items-center gap-6 w-full md:w-auto">
+                                        <div className="w-16 h-16 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center border border-blue-500/20 shrink-0 hidden sm:flex">
+                                            <Monitor className="w-8 h-8" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-2xl font-bold flex items-center gap-3">
+                                                Windows
+                                                <Badge variant="secondary" className="px-2 py-0.5 text-xs text-blue-500 bg-blue-500/10 border-blue-500/20 shadow-sm">Win 10 & 11</Badge>
+                                            </h3>
+                                            <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                                                <p><strong className="text-foreground/80">Size:</strong> 207 MB</p>
+                                                <p className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 group cursor-text">
+                                                    <strong className="text-foreground/80 shrink-0">SHA-256:</strong>
+                                                    <span className="font-mono text-[10px] sm:text-xs opacity-80 group-hover:opacity-100 transition-opacity break-all selection:bg-blue-500/30">3de9e0caab12f984586ca68d0a8b048479899a3bacb51ea04677bf9d8db0fd69</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button size="lg" className="w-full sm:w-[260px] h-14 rounded-xl text-lg font-semibold shadow-[0_8px_30px_-4px_rgba(59,130,246,0.4)] hover:shadow-[0_12px_40px_-4px_rgba(59,130,246,0.6)] bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-400 hover:to-blue-600 border border-blue-400/20 text-white transition-all group shrink-0" asChild>
+                                        <a href="https://github.com/udaypali/PentaSec/releases/download/v1.1.0/Pentasec-Setup-v1.1.0.exe">
+                                            <Download className="mr-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                                            Download .exe
+                                        </a>
+                                    </Button>
+                                </div>
+                            </TabsContent>
+
+                            {/* Linux */}
+                            <TabsContent value="linux" className="mt-0 outline-none focus-visible:ring-0">
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col md:flex-row gap-6 items-center justify-between p-6 md:p-8 rounded-2xl border border-orange-500/20 bg-orange-500/5 shadow-[0_4px_30px_-5px_rgba(249,115,22,0.15)] ring-1 ring-inset ring-orange-500/10 hover:bg-orange-500/10 transition-colors">
+                                    <div className="flex items-center gap-6 w-full md:w-auto">
+                                        <div className="w-16 h-16 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center border border-orange-500/20 shrink-0 hidden sm:flex">
+                                            <Terminal className="w-8 h-8" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-2xl font-bold flex items-center gap-3">
+                                                Linux
+                                                <Badge variant="secondary" className="px-2 py-0.5 text-xs text-orange-500 bg-orange-500/10 border-orange-500/20 shadow-sm">Any Distro</Badge>
+                                            </h3>
+                                            <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                                                <p><strong className="text-foreground/80">Size:</strong> 310 MB</p>
+                                                <p className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 group cursor-text">
+                                                    <strong className="text-foreground/80 shrink-0">SHA-256:</strong>
+                                                    <span className="font-mono text-[10px] sm:text-xs opacity-80 group-hover:opacity-100 transition-opacity break-all selection:bg-orange-500/30">e9e6716c666da6840e4c1c5cb119839bdc02cf40c0e23afd8493718326226b35</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button size="lg" className="w-full sm:w-[260px] h-14 rounded-xl text-lg font-semibold shadow-[0_8px_30px_-4px_rgba(249,115,22,0.4)] hover:shadow-[0_12px_40px_-4px_rgba(249,115,22,0.6)] bg-gradient-to-br from-orange-500 to-orange-700 hover:from-orange-400 hover:to-orange-600 border border-orange-400/20 text-white transition-all group shrink-0" asChild>
+                                        <a href="https://github.com/udaypali/PentaSec/releases/download/v1.1.0/Pentasec-v1.1.0.AppImage">
+                                            <Download className="mr-2 w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                                            Download .AppImage
+                                        </a>
+                                    </Button>
+                                </div>
+                            </TabsContent>
+
+                            {/* macOS */}
+                            <TabsContent value="macos" className="mt-0 outline-none focus-visible:ring-0">
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col md:flex-row gap-6 items-center justify-between p-6 md:p-8 rounded-2xl border border-purple-500/20 bg-purple-500/5 shadow-[0_4px_30px_-5px_rgba(168,85,247,0.15)] ring-1 ring-inset ring-purple-500/10 hover:bg-purple-500/10 transition-colors opacity-95">
+                                    <div className="flex items-center gap-6 w-full md:w-auto">
+                                        <div className="w-16 h-16 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center border border-purple-500/20 shrink-0 hidden sm:flex">
+                                            <Laptop className="w-8 h-8" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-2xl font-bold flex items-center gap-3">
+                                                macOS
+                                                <Badge variant="secondary" className="px-2 py-0.5 text-xs text-purple-500 bg-purple-500/10 border-purple-500/20 shadow-sm">Coming Soon</Badge>
+                                            </h3>
+                                            <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                                                <p>Support for macOS via DMG installer is in progress.</p>
+                                                <p>Stay tuned for updates!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button size="lg" variant="outline" className="w-full sm:w-[260px] h-14 rounded-xl text-lg font-semibold border-purple-500/30 text-purple-600/60 cursor-not-allowed shrink-0 bg-purple-500/5" disabled>
+                                        <Zap className="mr-2 w-5 h-5 opacity-50" />
+                                        Coming Soon
+                                    </Button>
+                                </div>
+                            </TabsContent>
+                        </div>
+                    </Tabs>
                 </section>
 
                 {/* 3. WHY CHOOSE PENTASEC (Grid) */}
@@ -236,9 +316,9 @@ export default function DownloadPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button size="lg" className="h-12 px-8 text-lg font-semibold shadow-lg shadow-primary/25" asChild>
-                            <a href="https://github.com/udaypali/PentaSec/releases/download/v1.1.0/Pentasec-Setup-v1.1.0.exe">
+                            <a href="#downloads">
                                 <Download className="mr-2 w-5 h-5" />
-                                Download (.exe)
+                                Choose Platform
                             </a>
                         </Button>
                         <Button variant="ghost" className="h-12 px-8 text-lg hover:bg-muted/50" asChild>
