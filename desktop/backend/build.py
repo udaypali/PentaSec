@@ -2,8 +2,10 @@ import os
 import shutil
 import subprocess
 import sys
+import platform
 
 APP_NAME = "backend"
+IS_WINDOWS = platform.system() == "Windows"
 ENTRY_FILE = "app.py"
 DIST_DIR = "dist"
 BUILD_DIR = "build"
@@ -35,7 +37,7 @@ def build():
         "--name",
         APP_NAME,
         "--add-data",
-        ".env;.",
+        f".env{os.pathsep}.",
         "--icon",
         "../public/logo.ico",
         ENTRY_FILE,
@@ -46,7 +48,8 @@ def build():
 
 def post_build():
     """Verify build output."""
-    exe_path = os.path.join(DIST_DIR, f"{APP_NAME}.exe")
+    exe_name = f"{APP_NAME}.exe" if IS_WINDOWS else APP_NAME
+    exe_path = os.path.join(DIST_DIR, exe_name)
 
     if os.path.exists(exe_path):
         print("\n[✓] Build successful.")

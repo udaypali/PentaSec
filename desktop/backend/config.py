@@ -2,7 +2,8 @@ import os
 import sys
 
 if getattr(sys, 'frozen', False):
-    app_data_dir = os.path.join(os.getenv('APPDATA'), 'PentasecDesktop')
+    appdata_base = os.getenv('APPDATA') or os.path.expanduser('~/.config')
+    app_data_dir = os.path.join(appdata_base, 'PentasecDesktop')
     if not os.path.exists(app_data_dir):
         os.makedirs(app_data_dir)
     DATA_DIR = os.path.join(app_data_dir, 'data')
