@@ -144,7 +144,8 @@ function startBackend() {
     if (isDev) return;
 
     const backendDir = path.join(process.resourcesPath, "backend");
-    const backendPath = path.join(backendDir, "backend.exe");
+    const backendExecutable = process.platform === "win32" ? "backend.exe" : "backend";
+    const backendPath = path.join(backendDir, backendExecutable);
     const logPath = path.join(app.getPath("userData"), "backend.log");
 
     if (!fs.existsSync(backendPath)) {
@@ -190,8 +191,17 @@ function stopBackend() {
     if (backendProcess && backendProcess.pid) {
         console.log("Force killing backend process...");
 
-        // Windows safe kill
-        exec(`taskkill /PID ${backendProcess.pid} /T /F`);
+        if (process.platform === "win32") {
+            // Windows safe kill
+            exec(`taskkill /PID ${backendProcess.pid} /T /F`);
+        } else {
+            // Linux/macOS kill
+            try {
+                process.kill(backendProcess.pid, "SIGTERM");
+            } catch (err) {
+                console.error("Failed to kill backend process:", err);
+            }
+        }
 
         backendProcess = null;
     }

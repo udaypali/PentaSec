@@ -114,6 +114,12 @@
       "artifactName": "Pentasec-Setup.exe",
       "icon": "public/logo.ico"
     },
+    "linux": {
+      "target": "AppImage",
+      "artifactName": "Pentasec-Setup.AppImage",
+      "category": "Utility",
+      "icon": "public/logo.png"
+    },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
