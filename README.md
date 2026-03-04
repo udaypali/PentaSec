@@ -98,38 +98,6 @@ The web app will be available at `http://localhost:3000`.
 
 ### Desktop App
 
-1. Install frontend dependencies:
-
-```bash
-cd desktop
-npm install
-```
-
-2. Install Python backend dependencies:
-
-```bash
-cd desktop/backend
-pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your configuration
-```
-
-3. Run in development mode:
-
-```bash
-cd desktop
-npm run electron:dev
-```
-
-Or run the backend separately:
-
-```bash
-cd desktop/backend
-python app.py --no-electron
-```
-
-### Building the Desktop App
-
 **Important:** Always compile the backend first before building the main application.
 
 #### Windows Setup and Build
@@ -159,7 +127,7 @@ cd ..
 npm run dist
 ```
 
-This produces the Windows installer `Pentasec-Setup.exe` in the `release/` directory.
+This produces the Windows installer `Pentasec-Setup.exe` in the `dist/` directory.
 
 #### Linux Setup and Build
 
@@ -188,7 +156,7 @@ cd ..
 npm run dist
 ```
 
-This produces the Linux AppImage `Pentasec-Setup.AppImage` in the `release/` directory.
+This produces the Linux AppImage `Pentasec-Setup.AppImage` in the `dist/` directory.
 
 ## Project Structure
 
