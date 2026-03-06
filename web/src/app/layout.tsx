@@ -20,6 +20,16 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Pentasec - AI Powered Pentest Reporting",
   description: "AI-powered penetration testing and security reporting platform",
+  openGraph: {
+    title: "Pentasec - AI Powered Pentest Reporting",
+    description: "AI-powered penetration testing and security reporting platform",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pentasec - AI Powered Pentest Reporting",
+    description: "AI-powered penetration testing and security reporting platform",
+  },
 };
 
 export default function RootLayout({
